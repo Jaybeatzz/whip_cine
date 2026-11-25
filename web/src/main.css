@@ -1,0 +1,255 @@
+@import "./aty-ui.css";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font);
+  user-select: none;
+  text-decoration: none;
+  outline: none;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* In-game NUI: the panel carries its own background. */
+  background: transparent;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   ATY UI v3 tokens
+   The old variable names in this file (--bg-surface, --text-primary ...) were not removed
+   but MAPPED to their v3 equivalents. A lot of existing CSS uses them; renaming would mean
+   going through every component. This way one file moves the whole interface to the new
+   palette, radii and typography.
+   ════════════════════════════════════════════════════════════════════ */
+:root {
+  /* ════════════════════════════════════════════════════════════════════
+     WHIP tokens. index.html loads whip_core's own fonts.css + base.css (and the server's
+     active skin, see utils/whip.js), so every value below follows WHIP and any WHIP theme.
+     The fallbacks after the comma are base.css's values, for a browser preview without
+     whip_core. Chromium 103 (FiveM's CEF): no color-mix(), so tints are WHIP's own alpha tokens.
+     ════════════════════════════════════════════════════════════════════ */
+  --font: var(--ui-font, 'Barlow', 'Segoe UI', sans-serif);
+  --font-display: var(--ui-font-display, 'Bricolage Grotesque', 'Barlow', sans-serif);
+
+  --bg: var(--ui-surface-solid, rgb(10, 12, 18));
+  --panel: var(--ui-surface-solid, rgb(10, 12, 18));
+  --panel-alt: var(--ui-surface-raised, rgba(10, 12, 18, 0.9));
+  --chrome-90: var(--ui-surface-raised, rgba(10, 12, 18, 0.9));
+  --chrome-75: var(--ui-surface, rgba(10, 12, 18, 0.75));
+  --menu-bg: var(--ui-surface-raised, rgba(10, 12, 18, 0.9));
+  --panel-glow: var(--ui-panel-glow, radial-gradient(120% 60% at 0% 0%, rgba(96, 165, 250, 0.07), transparent 60%));
+
+  --surface-1: var(--ui-surface-subtle, rgba(255, 255, 255, 0.02));
+  --surface-2: var(--ui-surface-light, rgba(255, 255, 255, 0.03));
+  --surface-3: var(--ui-surface-medium, rgba(255, 255, 255, 0.04));
+  --surface-4: var(--ui-surface-hover-strong, rgba(255, 255, 255, 0.10));
+  --stroke-1: var(--ui-border, rgba(255, 255, 255, 0.08));
+  --stroke-2: var(--ui-border-hover, rgba(255, 255, 255, 0.12));
+
+  /* Signal blue: what is live (sliders, playhead, keys). */
+  --accent: var(--ui-accent, #60a5fa);
+  --accent-soft: var(--ui-accent-light, rgba(96, 165, 250, 0.15));
+  --accent-subtle: var(--ui-accent-subtle, rgba(96, 165, 250, 0.07));
+  --accent-medium: var(--ui-accent-medium, rgba(96, 165, 250, 0.3));
+  --accent-glow: var(--ui-accent-glow, rgba(96, 165, 250, 0.2));
+  --accent-rgb: 96, 165, 250;
+  /* The house look's white pill: what is CHOSEN (tabs, toggles, the main button). */
+  --fill: var(--ui-pill, rgba(255, 255, 255, 0.93));
+  --fill-hover: var(--ui-pill-hover, #fff);
+  --on-fill: var(--ui-pill-ink, rgb(10, 12, 18));
+  --ring: var(--ui-ring, rgba(255, 255, 255, 0.65));
+
+  --danger: var(--ui-error, #f87171);
+  --danger-soft: var(--ui-error-light, rgba(248, 113, 113, 0.12));
+  --warn: var(--ui-warning, #fbbf24);
+  --warn-soft: var(--ui-warning-light, rgba(251, 191, 36, 0.15));
+  --success: var(--ui-success, #4ade80);
+  --success-soft: var(--ui-success-light, rgba(74, 222, 128, 0.12));
+  --info: var(--ui-info, #60a5fa);
+  --info-soft: var(--ui-accent-light, rgba(96, 165, 250, 0.15));
+
+  --text-1: var(--ui-text, rgba(255, 255, 255, 0.93));
+  --text-2: var(--ui-text, rgba(255, 255, 255, 0.93));
+  --text-3: var(--ui-text-mid, rgba(255, 255, 255, 0.5));
+  --text-4: var(--ui-text-dim, rgba(255, 255, 255, 0.25));
+  --text-label: var(--ui-text-label, rgba(255, 255, 255, 0.48));
+
+  /* WHIP's shape ladder: panel 20, pop 12, row 11, slot 8, sm 6, xs 4; choices are full pills. */
+  --r-pill: 999px;
+  --r-btn: var(--ui-radius-row, 11px);
+  --r-card: var(--ui-radius-panel, 20px);
+  --r-field: var(--ui-radius-row, 11px);
+  --r-modal: var(--ui-radius-panel, 20px);
+  --r-panel: var(--ui-radius-panel, 20px);
+  --r-menu: var(--ui-radius-pop, 12px);
+  --r-inner: var(--ui-radius-row, 11px);
+  --r-sm: var(--ui-radius-sm, 6px);
+  --r-tile: var(--ui-radius-slot, 8px);
+  --r-badge: var(--ui-radius-xs, 4px);
+
+  --ease-spring: var(--ui-ease-bounce, cubic-bezier(0.34, 1.4, 0.64, 1));
+  --ease-spring-soft: var(--ui-ease, cubic-bezier(0.16, 1, 0.3, 1));
+  --ease-out: var(--ui-ease, cubic-bezier(0.16, 1, 0.3, 1));
+  --ease-glass: var(--ui-ease-bounce, cubic-bezier(0.34, 1.4, 0.64, 1));
+  --shadow-menu: var(--ui-shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05));
+
+  --z-hud: 30;
+  --z-panel: 40;
+  --z-menu: 94;
+  --z-modal: 95;
+  --z-toast: 130;
+  --z-radial: 140;
+  --z-loading: 150;
+
+  /* Old names -> current tokens */
+  --accent-dim: var(--accent-soft);
+  --bg-base: var(--panel);
+  --bg-surface: var(--panel);
+  --bg-elevated: var(--surface-3);
+  --text-primary: var(--text-1);
+  --text-secondary: var(--text-3);
+  --text-muted: var(--text-4);
+  --border: var(--stroke-1);
+  --border-focus: var(--accent-soft);
+}
+
+/* Typography base: WHIP's Barlow; titles in the display face, labels in small caps (layout.css). */
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font);
+  font-weight: 500;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+input,
+textarea {
+  user-select: text;
+}
+
+/* Descenders must not be clipped in type above 20px. */
+h1,
+h2,
+h3 {
+  line-height: 1.16;
+  font-family: var(--font-display);
+  font-weight: var(--ui-fw-display, 800);
+  letter-spacing: -0.01em;
+}
+
+/* The old .btn, brought into the v3 language */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 14px;
+  font-size: var(--ui-fs-sm, 11px);
+  font-weight: var(--ui-fw-bold, 700);
+  color: var(--text-1);
+  background: var(--surface-3);
+  border: 1px solid var(--stroke-1);
+  border-radius: var(--r-btn);
+  cursor: pointer;
+  transition:
+    background 0.18s var(--ease-out),
+    border-color 0.18s var(--ease-out),
+    color 0.18s var(--ease-out),
+    transform 0.14s var(--ease-out);
+}
+
+.btn:hover {
+  color: var(--text-1);
+  background: var(--surface-4);
+  border-color: var(--stroke-2);
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn.primary {
+  /* THE white pill: one per panel, the thing that panel is for. */
+  color: var(--on-fill);
+  background: var(--fill);
+  border-color: var(--fill);
+}
+
+.btn.primary:hover {
+  background: var(--fill-hover);
+  border-color: var(--fill-hover);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Scrollbar: 4px, transparent track */
+::-webkit-scrollbar {
+  width: var(--ui-scrollbar-w, 3px);
+  height: var(--ui-scrollbar-w, 3px);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ui-scrollbar-thumb, rgba(255, 255, 255, 0.08));
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ui-scrollbar-thumb-hover, rgba(255, 255, 255, 0.15));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Layer scale
+   The kit's --z-* tokens end at 150; a NUI may need a much wider scale. Pick the band for a
+   new layer from here:
+       500      labels over the world, below the panels
+       1000     bottom panels (dock + control bar)
+       9998-9999    tool overlays
+       99997-99999  full-screen menus and modals
+       200000   #stage: the layer of teleported modals
+       300000   loading screen, blocks everything
+       999999   drag ghost, follows the cursor, on top of everything */
+
+/* Modal layer
+   The kit's modals are teleported to the #stage root. Because #stage carries the layer, a
+   modal's own z value no longer competes with the application. The drag ghost (999999) is
+   higher on purpose: a preview that follows the cursor has to stay above an open modal. */
+#stage {
+  position: fixed;
+  inset: 0;
+  z-index: 200000;
+  /* When the layer is empty, clicks have to reach the game. Children turn their own
+   pointer-events back on. */
+  pointer-events: none;
+}
+
+#stage > * {
+  pointer-events: auto;
+}
+
+/* The backdrop of a closed modal covers the whole screen; it must not swallow clicks. */
+#stage > .ui-modal-back:not(.show) {
+  pointer-events: none;
+}

@@ -1,0 +1,4 @@
+# interface build dependencies
+web/node_modules/
+
+# projects are stored in the server's database (whip_cine_projects)
